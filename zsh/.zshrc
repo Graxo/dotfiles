@@ -114,3 +114,9 @@ source ~/.aliases
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+#Force terminal to 256-color if supported
+if [[ "$TERM" != "xterm-256color" ]]; then
+  export TERM=xterm-256color
+fi
+
