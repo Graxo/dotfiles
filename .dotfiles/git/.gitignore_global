@@ -1,0 +1,9 @@
+# ~/.gitignore_global
+*.log
+*.swp
+*.bak
+*.tmp
+.DS_Store
+node_modules/
+.env
+*.pyc

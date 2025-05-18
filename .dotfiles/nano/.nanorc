@@ -1,0 +1,10 @@
+## Global nano settings
+set linenumbers
+set softwrap
+set tabsize 4
+set autoindent
+set mouse
+set smarthome
+
+## Load syntax highlighting rules
+include "~/.nano/syntax/*.nanorc"
