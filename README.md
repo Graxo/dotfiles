@@ -1,7 +1,6 @@
 # 🚀 Graxo's Dotfiles
 
-This repository contains the configuration files (dotfiles) used to manage user environments across multiple servers — with support for automation via Ansible or manual setup using a `install.sh` script.
-
+This repository contains the configuration files (dotfiles) used to manage user environments across multiple servers.
 > Optimized for speed, portability, Zsh (with Powerlevel10k).
 
 ---
@@ -10,9 +9,7 @@ This repository contains the configuration files (dotfiles) used to manage user 
 
 - ✅ Zsh configured with [Powerlevel10k](https://github.com/romkatv/powerlevel10k)
 - ✅ Stow-based dotfile management (`bash`, `zsh`, `git`, `nano`, `aliases`)
-- ✅ Git configuration with identity
-- ✅ Hardened SSH client config
-- ✅ Clean separation of Ansible-managed vs. manually-installable components
+- ✅ Clean separation of files
 
 ---
 
@@ -33,9 +30,7 @@ This repository contains the configuration files (dotfiles) used to manage user 
 
 ## ⚙️ Setup Instructions
 
-### 🖥️ Manual: Install manually using `install.sh`
-
-On systems where Ansible isn’t available, use the manual bootstrap script:
+### 🖥️ Install manually using `install.sh`
 
 ```bash
 git clone git@github.com:Graxo/dotfiles.git ~/.dotfiles
@@ -61,8 +56,6 @@ Make sure your terminal uses a [Nerd Font](https://github.com/ryanoasis/nerd-fon
 ## 📦 Requirements
 
 - `git`, `zsh`, `stow`, `curl`
-- Optionally: Ansible with `community.general`, `community.crypto`
-
 ---
 
 ## 🤝 Contributing
@@ -73,9 +66,8 @@ This is a personal environment config repo, but improvements are welcome. Forks 
 
 ## 🧠 Inspiration
 
-- [Mathias Bynens’ dotfiles](https://github.com/mathiasbynens/dotfiles)
 - [Powerlevel10k](https://github.com/romkatv/powerlevel10k)
-- [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) (optional)
+- [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh)
 
 ---
 
