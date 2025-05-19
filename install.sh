@@ -7,12 +7,8 @@ DOTFILES_REPO="git@github.com:Graxo/dotfiles.git"
 DOTFILES_DIR="${USER_HOME}/.dotfiles"
 STOW_DIRS=("bash" "zsh" "git" "nano" "aliases")
 P10K_REPO="https://github.com/romkatv/powerlevel10k.git"
-P10K_DIR="~/.oh-my-zsh/custom/themes/powerlevel10k"
+P10K_DIR="$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
 REQUIRED_PACKAGES=("git" "zsh" "stow" "curl" "nano")
-
-#git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
-#  ~/.oh-my-zsh/custom/themes/powerlevel10k
-
 
 echo "[+] Installing dotfiles for user: $(whoami)"
 
@@ -63,7 +59,7 @@ for dir in "${STOW_DIRS[@]}"; do
     [ -d "$dir" ] && stow -t "$USER_HOME" "$dir"
 done
 
-# Optional: Install Oh My Zsh (if you want it)
+# 4. Install Oh My Zsh
 if [ ! -d "$USER_HOME/.oh-my-zsh" ]; then
     echo "[+] Installing Oh My Zsh..."
     export RUNZSH=no
@@ -75,10 +71,15 @@ fi
 
 
 # 5. Install Powerlevel10k
-if [ ! -d "$P10K_DIR" ]; then
     echo "[+] Installing Powerlevel10k..."
-    git clone --depth=1 "$P10K_REPO" "$P10K_DIR"
+if [ ! -d $P10K_DIR ]; then
+    echo "[=] Creating Powerlevel10k theme directory..."
+    mkdir -p $P10K_DIR
+    git clone --depth=1 $P10K_REPO $P10K_DIR
+else
+    git clone --depth=1 $P10K_REPO $P10K_DIR
 fi
+
 
 # 6. Copy .p10k.zsh if present in repo
 if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ] && [ ! -f "$USER_HOME/.p10k.zsh" ]; then
