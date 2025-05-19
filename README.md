@@ -3,6 +3,9 @@
 This repository contains the configuration files (dotfiles) used to manage user environments across multiple servers.
 > Optimized for speed, portability, Zsh (with Powerlevel10k).
 
+Preview:
+
+![screenshot](https://koper.cloud/dotfiles_example.png)
 ---
 
 ## ✨ Features
