@@ -1,4 +1,4 @@
-# 🚀 graxo's Dotfiles
+# 🚀 Graxo's Dotfiles
 
 This repository contains the configuration files (dotfiles) used to manage user environments across multiple servers — with support for automation via Ansible or manual setup using a `install.sh` script.
 
