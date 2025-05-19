@@ -2,60 +2,94 @@
 
 set -euo pipefail
 
-echo "[+] Starting dotfiles installation..."
+USER_HOME="${HOME}"
+DOTFILES_REPO="git@github.com:Graxo/dotfiles.git"
+DOTFILES_DIR="${USER_HOME}/.dotfiles"
+STOW_DIRS=("bash" "zsh" "git" "nano" "aliases")
+P10K_REPO="https://github.com/romkatv/powerlevel10k.git"
+P10K_DIR="~/.oh-my-zsh/custom/themes/powerlevel10k"
+REQUIRED_PACKAGES=("git" "zsh" "stow" "curl" "nano")
 
-### CONFIG ###
-DOTFILES_DIR="$HOME/.dotfiles"
-STOW_FOLDERS=("bash" "zsh" "git" "nano" "aliases")
-REQUIRED_APPS=("zsh" "git" "stow" "curl")
-DEFAULT_SHELL="$(command -v zsh)"
-################
+#git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
+#  ~/.oh-my-zsh/custom/themes/powerlevel10k
 
-# Function to install a package depending on OS
-install_package() {
-    local pkg=$1
-    echo "[*] Installing $pkg..."
-    if command -v apt >/dev/null 2>&1; then
-        sudo apt update && sudo apt install -y "$pkg"
-    elif command -v dnf >/dev/null 2>&1; then
-        sudo dnf install -y "$pkg"
-    elif command -v pacman >/dev/null 2>&1; then
-        sudo pacman -Syu --noconfirm "$pkg"
-    elif command -v brew >/dev/null 2>&1; then
-        brew install "$pkg"
-    else
-        echo "[!] Unsupported package manager. Please install $pkg manually."
-        exit 1
-    fi
-}
 
-# Check and install required apps
-for app in "${REQUIRED_APPS[@]}"; do
-    if ! command -v "$app" >/dev/null 2>&1; then
-        install_package "$app"
-    else
-        echo "[+] $app is already installed."
+echo "[+] Installing dotfiles for user: $(whoami)"
+
+# 1. Ensure required packages
+for pkg in "${REQUIRED_PACKAGES[@]}"; do
+    if ! command -v "$pkg" >/dev/null 2>&1; then
+        echo "[*] Installing missing package: $pkg"
+        if command -v apt >/dev/null 2>&1; then
+            sudo apt update && sudo apt install -y "$pkg"
+        elif command -v dnf >/dev/null 2>&1; then
+            sudo dnf install -y "$pkg"
+        elif command -v pacman >/dev/null 2>&1; then
+            sudo pacman -Sy --noconfirm "$pkg"
+        else
+            echo "[-] Unsupported package manager. Install $pkg manually."
+            exit 1
+        fi
     fi
 done
 
-# Use GNU Stow to symlink configs
-echo "[+] Stowing dotfiles..."
-cd "$DOTFILES_DIR"
-for folder in "${STOW_FOLDERS[@]}"; do
-    if [ -d "$folder" ]; then
-        stow "$folder"
-    else
-        echo "[!] Warning: Folder '$folder' does not exist in $DOTFILES_DIR"
-    fi
-done
-
-# Change default shell to Zsh if not already
-if [ "$SHELL" != "$DEFAULT_SHELL" ]; then
-    echo "[+] Changing default shell to Zsh..."
-    chsh -s "$DEFAULT_SHELL"
-    echo "[!] Default shell changed. Please log out and back in to apply."
+# 2. Clone dotfiles
+if [ ! -d "$DOTFILES_DIR" ]; then
+    echo "[+] Cloning dotfiles..."
+    git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
 else
-    echo "[+] Zsh is already the default shell."
+    echo "[=] Dotfiles repo already exists. Pulling latest..."
+    git -C "$DOTFILES_DIR" pull
 fi
 
-echo "[✓] Dotfiles installation complete!"
+# 3. Backup conflicting files
+for dir in "${STOW_DIRS[@]}"; do
+    if [ -d "$DOTFILES_DIR/$dir" ]; then
+        for file in "$DOTFILES_DIR/$dir"/.*; do
+            [ "$(basename "$file")" = "." ] || [ "$(basename "$file")" = ".." ] && continue
+            target="${USER_HOME}/$(basename "$file")"
+            if [ -f "$target" ] && [ ! -L "$target" ]; then
+                echo "[~] Backing up $target to $target.backup"
+                mv "$target" "$target.backup"
+            fi
+        done
+    fi
+done
+
+# 4. Stow dotfiles
+echo "[+] Stowing dotfiles..."
+cd "$DOTFILES_DIR"
+for dir in "${STOW_DIRS[@]}"; do
+    [ -d "$dir" ] && stow -t "$USER_HOME" "$dir"
+done
+
+# Optional: Install Oh My Zsh (if you want it)
+if [ ! -d "$USER_HOME/.oh-my-zsh" ]; then
+    echo "[+] Installing Oh My Zsh..."
+    export RUNZSH=no
+    export CHSH=no
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+else
+    echo "[=] Oh My Zsh already installed"
+fi
+
+
+# 5. Install Powerlevel10k
+if [ ! -d "$P10K_DIR" ]; then
+    echo "[+] Installing Powerlevel10k..."
+    git clone --depth=1 "$P10K_REPO" "$P10K_DIR"
+fi
+
+# 6. Copy .p10k.zsh if present in repo
+if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ] && [ ! -f "$USER_HOME/.p10k.zsh" ]; then
+    echo "[+] Installing .p10k.zsh config"
+    cp "$DOTFILES_DIR/zsh/.p10k.zsh" "$USER_HOME/.p10k.zsh"
+fi
+
+# 7. Set Zsh as default shell
+if [ "$SHELL" != "$(command -v zsh)" ]; then
+    echo "[+] Changing login shell to Zsh"
+    chsh -s "$(command -v zsh)"
+fi
+
+echo "[✓] Dotfiles installation complete. Please restart your shell or log out/in."
