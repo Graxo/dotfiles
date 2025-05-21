@@ -41,6 +41,7 @@ cd ~/.dotfiles
 chmod +x install.sh
 ./install.sh
 ```
+_Change the commit info in ./git/.gitconfig to your own_
 
 This:
 - Installs required packages
