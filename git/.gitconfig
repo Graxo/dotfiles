@@ -1,6 +1,6 @@
 [user]
     name = Graxo
-    email = <email>
+	email = github.robin@koper.cloud
     # signingkey = ABC1234DEF5678       # Uncomment and add your GPG/SSH key if you sign commits
     # signcommits = true                # Enforce signing commits
 
@@ -54,3 +54,5 @@
 
 [status]
     showUntrackedFiles = all
+[safe]
+	directory = /home/automation/.ansible/awx-homelab
